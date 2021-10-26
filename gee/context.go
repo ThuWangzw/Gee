@@ -44,12 +44,16 @@ func (context *Context) SetHeader(key, value string) {
 	context.W.Header().Set(key, value)
 }
 
+func (context *Context) Error(code int, msg string) {
+	http.Error(context.W, msg, code)
+}
+
 func (context *Context) JSON(code int, obj interface{}) {
 	context.SetHeader("Content-Type", "application/json")
 	context.Status(code)
 	encoder := json.NewEncoder(context.W)
 	if err := encoder.Encode(obj); err != nil {
-		http.Error(context.W, err.Error(), http.StatusInternalServerError)
+		context.Error(http.StatusInternalServerError, err.Error())
 	}
 }
 
@@ -57,7 +61,7 @@ func (context *Context) String(code int, format string, a ...interface{}) {
 	context.SetHeader("Content-Type", "text/plain")
 	context.Status(code)
 	if _, err := fmt.Fprintf(context.W, format, a...); err != nil {
-		http.Error(context.W, err.Error(), http.StatusInternalServerError)
+		context.Error(http.StatusInternalServerError, err.Error())
 	}
 }
 
@@ -65,6 +69,6 @@ func (context *Context) HTML(code int, html string) {
 	context.SetHeader("Content-Type", "text/html")
 	context.Status(code)
 	if _, err := fmt.Fprint(context.W, html); err != nil {
-		http.Error(context.W, err.Error(), http.StatusInternalServerError)
+		context.Error(http.StatusInternalServerError, err.Error())
 	}
 }

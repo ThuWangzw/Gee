@@ -1,19 +1,23 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/ThuWangzw/Gee/gee"
 )
 
 func main() {
-	gee := gee.New()
-	gee.Get("/hello", func(w http.ResponseWriter, req *http.Request) {
-		fmt.Fprintf(w, "(get)hello!")
+	r := gee.New()
+	r.Get("/", func(c *gee.Context) {
+		c.HTML(http.StatusOK, "<h1>HomePage</h1>")
 	})
-	gee.Post("/hello", func(w http.ResponseWriter, req *http.Request) {
-		fmt.Fprintf(w, "(post)hello!")
+	r.Post("/info", func(c *gee.Context) {
+		c.JSON(http.StatusOK, gee.H{
+			"name": c.PostForm("name"),
+		})
 	})
-	gee.Run("0.0.0.0:9000")
+	r.Get("/info", func(c *gee.Context) {
+		c.String(http.StatusOK, c.Query("name"))
+	})
+	r.Run("0.0.0.0:9000")
 }

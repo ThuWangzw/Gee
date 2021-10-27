@@ -19,5 +19,15 @@ func main() {
 	r.Get("/info", func(c *gee.Context) {
 		c.String(http.StatusOK, c.Query("name"))
 	})
+	r.Get("/book/:id/info", func(c *gee.Context) {
+		id := c.Param("id")
+		c.String(http.StatusOK, "this is book %s information", id)
+	})
+	r.Get("/static/*filepath", func(c *gee.Context) {
+		filepath := c.Param("filepath")
+		c.JSON(http.StatusOK, gee.H{
+			"filepath": filepath,
+		})
+	})
 	r.Run("0.0.0.0:9000")
 }

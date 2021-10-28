@@ -7,21 +7,20 @@ import (
 type HandleFunc func(*Context)
 
 type Engine struct {
+	*RouterGroup
 	routers *Router
 }
 
 func New() *Engine {
-	return &Engine{
+	engine := new(Engine)
+	*engine = Engine{
 		routers: NewRouter(),
+		RouterGroup: &RouterGroup{
+			children: make([]*RouterGroup, 0),
+			engine:   engine,
+		},
 	}
-}
-
-func (gee *Engine) Get(url string, handler HandleFunc) {
-	gee.routers.addHandler("GET", url, handler)
-}
-
-func (gee *Engine) Post(url string, handler HandleFunc) {
-	gee.routers.addHandler("POST", url, handler)
+	return engine
 }
 
 func (gee *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {

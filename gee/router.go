@@ -40,5 +40,6 @@ func (router *Router) handle(context *Context) {
 		return
 	}
 	handler := router.handlers[pattern][method]
-	handler(context)
+	context.handlers = append(context.handlers, handler)
+	context.Next()
 }

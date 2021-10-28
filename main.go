@@ -2,9 +2,24 @@ package main
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/ThuWangzw/Gee/gee"
+	log "github.com/sirupsen/logrus"
 )
+
+func LogMiddleWare() func(*gee.Context) {
+	return func(c *gee.Context) {
+		startTime := time.Now()
+		path := c.Path
+		c.Next()
+		log.WithFields(log.Fields{
+			"URL":    path,
+			"Time":   time.Since(startTime),
+			"Method": c.Method,
+		}).Print("")
+	}
+}
 
 func main() {
 	r := gee.New()
@@ -25,5 +40,6 @@ func main() {
 	r.Get("/", func(c *gee.Context) {
 		c.HTML(http.StatusOK, "<h1>HomePage</h1>")
 	})
+	r.Use(LogMiddleWare())
 	r.Run("0.0.0.0:9000")
 }

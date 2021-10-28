@@ -17,14 +17,25 @@ type Context struct {
 	Params map[string]string
 
 	ResponceStatus int
+
+	handlers   []HandleFunc
+	handlerIdx int
 }
 
 func NewContext(w http.ResponseWriter, req *http.Request) *Context {
 	return &Context{
-		W:      w,
-		Req:    req,
-		Path:   req.URL.Path,
-		Method: req.Method,
+		W:          w,
+		Req:        req,
+		Path:       req.URL.Path,
+		Method:     req.Method,
+		handlers:   make([]HandleFunc, 0),
+		handlerIdx: -1,
+	}
+}
+
+func (context *Context) Next() {
+	for context.handlerIdx++; context.handlerIdx < len(context.handlers); context.handlerIdx++ {
+		context.handlers[context.handlerIdx](context)
 	}
 }
 
